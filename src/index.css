@@ -5,7 +5,7 @@
 }
 
 .horizontal_move {
-  animation: move 2 forwards;
+  animation: move 2s;
 }
 
 @keyframes jumpIn {

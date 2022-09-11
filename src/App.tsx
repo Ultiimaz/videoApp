@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Marquee from "react-fast-marquee";
 import "./index.css";
 
 interface IEvent {
@@ -45,40 +46,12 @@ function Embed(props: EmbedProps) {
 }
 
 function Ticker(props: { messages: ITickerMessage[] }) {
-  const tickerRef = useRef<HTMLDivElement>();
-  const [message, setMessage] = useState<ITickerMessage>(props.messages[0]);
-  useEffect(() => {
-    let index = 0;
-    tickerRef.current.addEventListener("animationstart", function(){
-      index++;
-    });
-    tickerRef.current.addEventListener("animationend", function () {
-      console.log("animation end",index);
-      if (index < props.messages.length) {
-        index++;
-        setMessage(props.messages[index]);
-        console.log("Sven 1",props.messages[index]);
-      } else {
-        setMessage(props.messages[index]);
-        console.log("Sven 2",props.messages[index]);
-      }
-    });
-  }, [props.messages, tickerRef]);
-
   return (
-    <div
-      ref={tickerRef}
-      style={{
-        background: "green",
-        width: "auto",
-        height: 50,
-        position: "relative",
-        justifySelf: "end",
-      }}
-      className="horizontal_move"
-    >
-      {message?.body}
-    </div>
+    <Marquee gradient={false} style={{ zIndex: 100, float: "right" }}>
+      {props.messages.map((message) => (
+        <div>{message.body}</div>
+      ))}
+    </Marquee>
   );
 }
 
@@ -90,6 +63,7 @@ function GoalEventComponent(props: { event: IGoalEvent }) {
         justifyContent: "center",
         width: 200,
         height: 75,
+        zIndex: 5,
         background: "purple",
       }}
       className="jump"
@@ -138,18 +112,21 @@ function EmbedOverlay(props: {
         pointerEvents: "none",
         backgroundColor: "transparant",
         display: "flex",
+        flexDirection: "column",
       }}
       ref={embedRef}
     >
-      {props.events
-        .filter(
-          (event) =>
-            props.current_time >= event.time &&
-            props.current_time <= event.time + 5
-        )
-        .map((event) => {
-          return <Embed event={event} />;
-        })}
+      <div style={{ zIndex: 5, minHeight: 75 }}>
+        {props.events
+          .filter(
+            (event) =>
+              props.current_time >= event.time &&
+              props.current_time <= event.time + 5
+          )
+          .map((event) => {
+            return <Embed event={event} />;
+          })}
+      </div>
       <Ticker messages={props.tickerMessages} />
     </div>
   );
@@ -196,7 +173,6 @@ export default function App(): JSX.Element {
     <div className="App">
       <video controls ref={videoRef} width={980} height={540}>
         <source src="/video.mp4" />
-        test
       </video>
       {videoRef.current && (
         <EmbedOverlay
